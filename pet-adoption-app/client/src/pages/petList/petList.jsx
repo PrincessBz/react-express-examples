@@ -1,10 +1,20 @@
 import "./petList.css";
+import { useEffect, useState } from "react";
 
 export function PetList() {
-    const pets = [
-        { name: "Local", type: "Dog", age: 3 },
-        { name: "React", type: "Cat", age: 2 }
-    ];
+    const [pets, setPets] = useState([]);
+
+    useEffect(() => {
+        fetch("/api/pets")
+            .then((response) => response.json())
+            .then((pets) => {
+                setPets(pets);
+            })
+            .catch((error) => {
+                console.error("Error fetching pets:", error);
+            });
+    }, []);
+
 
     return (
         <>

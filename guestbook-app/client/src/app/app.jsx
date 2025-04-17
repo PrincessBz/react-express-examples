@@ -1,18 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./app.css";
 
 export function App() {
-  const [messages, setMessages] = useState([
-    { name: "Alice", text: "Hello, world!" },
-    { name: "Bob", text: "React is cool." }
-  ]);
-
+  const [messages, setMessages] = useState([]);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
+
+  useEffect(() => {
+    fetch("/api/messages")
+      .then((response) => response.json())
+      .then((messages) => setMessages(messages));
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newMessage = { name, text };
+
+    fetch("/api/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newMessage)
+    })
+      .then((response) => response.json())
+      .then((message) => {
+        setMessages([...messages, message]);
+      });
+
     setMessages([...messages, newMessage]);
     setName("");
     setText("");
@@ -40,7 +55,9 @@ export function App() {
 
       <ul className="message-list">
         {messages.map((msg, i) => (
-          <li key={i}><strong>{msg.name}</strong>: {msg.text}</li>
+          <li key={i}>
+            <strong>{msg.name}</strong>: {msg.text}
+          </li>
         ))}
       </ul>
     </main>
